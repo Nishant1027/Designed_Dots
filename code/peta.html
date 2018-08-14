@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" >
+    </head>
+    <body>
+        <style type="text/css">
+            @import url('https://fonts.googleapis.com/css?family=Exo|Josefin+Slab|Lobster|Satisfy');
+           
+             body {
+                margin:0;
+                background:#fff;
+                text-align:center;
+            }
+            
+            input[type="range"]{
+                background:rgb(68,238,255);
+                -webkit-appearance:none !important;
+                height:5px;
+                border-radius:3px;
+                border:2px solid #000;
+                display:block;
+                margin:15px auto;
+                outline:none;
+            }
+            
+            input[type="button"]{
+                height:25px;
+                width:70px;
+                border:none;
+                background:#000;
+                color:#fff;
+                border-radius:6px;
+                margin:2px;
+                outline:none;
+                font-family: 'Lobster', cursive;
+            }
+            
+            input[type="button"]:hover{
+                background:rgb(0,246,216);
+            }
+            
+            h3{
+                background:-webkit-linear-gradient(left,rgb(252,33,83),rgb(252,142,83),rgb(42,242,176),rgb(42,181,255),rgb(125,85,255),rgb(249,67,252));
+                color:transparent;
+                 -webkit-background-clip: text;
+                 background-clip: text;
+                 font-family: 'Satisfy', cursive;
+            }
+        </style>
+        <canvas id="myCanvas"></canvas>
+        <input id="number" type="range" max="1000" min="100" value="500" oninput="update(10,30,40)">
+        <input id="radius" type="range" max="10" min="1" value="3" oninput="update(10,30,40)">
+        <input id="speed" type="range" max="5" min="1" value="3" oninput="update(10,30,40)">
+        <input type="button" onclick="update(50,100,100)" value="Color-01">
+        <input type="button" onclick="update(10,200,50)" value="Color-02">
+        <input type="button" onclick="update(255,50,100)" value="Color-03">
+        <input type="button" onclick="update(255,255,10)" value="Color-04">
+        <input type="button" onclick="update(150,1,200)" value="Color-05">
+        <input type="button" onclick="update(255,255,255)" value="Color-06">
+        <input type="button" onclick="update(10,0,0)" value="Color-07">
+        <h3>Designed Dots</h3>
+        <script type="text/javascript">
+            var w=window.innerWidth;
+            var h=window.innerHeight;
+            if(w>h){
+                w=h-100;
+                h=w;
+            }
+            if(w<100){
+                w=360;
+                h=360;
+            }
+            h=w;
+            
+            var x=w/2;
+            var y=w/2;
+            var r=3;
+            var number=500;
+            var v=3;
+            var angle=Math.PI*2/number;
+            var balls=[];
+            var red=255;
+            var green=255;
+            var blue=255;
+            var intv;
+            
+            function colorChange(dr,dg,db){
+                red-=dr;
+                if(red<10){
+                    red=255;
+                    green-=dg;
+                    if(green<10){
+                        green=255;
+                        blue-=db;
+                        if(blue<10){
+                            blue=255;
+                            red=255;
+                            green=255;
+                        }
+                    }
+                }
+            }
+            
+            function ready(){
+                balls=[];
+                for(n=0;n<number;n++){
+                    balls[n]={
+                        bx:x,
+                        by:y,
+                        dx:v*Math.sin(n*angle),
+                        dy:v*Math.cos(n*angle)
+                    }
+                }
+            }
+            
+            
+            var c=document.getElementById("myCanvas");
+                c.height=w;
+                c.width=w;
+            var ctx=c.getContext("2d");
+            
+            function draw(){
+                for(n=0;n<number;n++){
+                    ctx.beginPath();
+                    ctx.arc(balls[n].bx+balls[n].dx,h-(balls[n].by+balls[n].dy),r,0,Math.PI*2);
+                    ctx.fillStyle="rgb("+red+","+green+","+blue+")";
+                    ctx.fill();
+                    ctx.closePath();
+                    balls[n].bx+=balls[n].dx;
+                    balls[n].by+=balls[n].dy;
+                    if(balls[n].by<0 || balls[n].by>h){
+                        balls[n].dy=-balls[n].dy;
+                    }
+                    if(balls[n].bx<0 || balls[n].bx>w){
+                        balls[n].dx=-balls[n].dx;
+                    }
+                }
+            }
+            
+            function update(drc,dgc,dbc){
+                number=document.getElementById("number").value;
+                angle=Math.PI*2/number;
+                r=document.getElementById("radius").value;
+                v=document.getElementById("speed").value;
+                ready();
+                clearInterval(intv);
+                intv=setInterval(function(){
+                    colorChange(drc,dgc,dbc);
+                    ctx.beginPath();
+                    ctx.rect(0,0,w,h);
+                    ctx.fillStyle="rgba(0,0,0,.06)";
+                    ctx.fill();
+                    draw();
+                },10)
+            }
+            
+            window.onload=function(){
+                setTimeout(function(){
+                    update(10,30,40);
+                },50)
+            }
+        </script>
+    </body>
+</html>
